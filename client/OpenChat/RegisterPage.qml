@@ -13,6 +13,68 @@ Page {
         }
     }
 
+    property var handlers: ({
+           1001: onGetVerifyCode,      // ReqId::ID_GET_VERIFY_CODE
+           1002: onRegUser             // ReqId::ID_REG_USER
+       })
+
+    function showTip(msg, ok) {
+        errorText.text = msg
+        errorText.color = ok ? "#10B981" : "#EF4444"
+        errorText.visible = true
+    }
+
+    function onGetVerifyCode(jsonObj) {
+            if (jsonObj.error !== 0) {                       // ErrorCodes::SUCCESS
+                showTip(qsTr("参数错误"), false)
+                return
+            }
+            let email = jsonObj.email
+            showTip(qsTr("验证码已发送到邮箱，注意查收"), true)
+            console.log("email is", email)
+        }
+
+        function onRegUser(jsonObj) {
+            if (jsonObj.error !== 0) {
+                showTip(qsTr("参数错误"), false)
+                return
+            }
+            let email = jsonObj.email
+            showTip(qsTr("用户注册成功"), true)
+            console.log("email is", email)
+            console.log("user uuid is", jsonObj.uid)
+            //changeTipPage()todo
+        }
+
+    Connections {
+        target: HttpMgr
+        function onSig_reg_mod_finish(reqId, res, err) {
+
+            if (err !== 0)
+            {
+                errorText.text = "网络请求错误（错误码 " + err + "）"
+                errorText.visible = true
+                return
+            }
+            let jsonDoc
+            try {
+                jsonDoc = JSON.parse(res)
+            } catch (e) {
+                errorText.text = "JSON解析失败"
+                errorText.visible = true
+                return
+            }
+
+            if (typeof jsonDoc !== "object" || jsonDoc === null || Array.isArray(jsonDoc)) {
+                errorText.text = "JSON解析失败"
+                errorText.visible = true
+                return
+            }
+                handlers[reqId](jsonDoc)
+        }
+    }
+
+
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 12
@@ -29,6 +91,7 @@ Page {
 
         // 一个内联的组件，减少重复代码
         component ModernTextField : TextField {
+            id: control
             placeholderTextColor: "#9CA3AF"
             Layout.preferredWidth: 260
             Layout.preferredHeight: 25
@@ -36,8 +99,8 @@ Page {
             color: "#374151"
             background: Rectangle {
                 radius: 6
-                color: parent.activeFocus ? "#FFFFFF" : "#F3F4F6"
-                border.color: parent.activeFocus ? "#3B82F6" : "transparent"
+                color: control.activeFocus ? "#FFFFFF" : "#F3F4F6"
+                border.color: control.activeFocus ? "#3B82F6" : "transparent"
                 border.width: 1
                 Behavior on color { ColorAnimation { duration: 150 } }
                 Behavior on border.color { ColorAnimation { duration: 150 } }
@@ -77,11 +140,11 @@ Page {
 
                 background: Rectangle {
                     radius: 6
-                    color: parent.enabled ? (parent.pressed ? "#2563EB" : (parent.hovered ? "#60A5FA" : "#3B82F6")) : "#D1D5DB"
+                    color: getCodeBtn.enabled ? (getCodeBtn.pressed ? "#2563EB" : (getCodeBtn.hovered ? "#60A5FA" : "#3B82F6")) : "#D1D5DB"
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
-                    text: parent.text
+                    text: getCodeBtn.text
                     color: "white"
                     font.pixelSize: 12
                     horizontalAlignment: Text.AlignHCenter
@@ -106,6 +169,7 @@ Page {
 
         // 注册按钮
         Button {
+            id: regBtn
             text: "注册"
             Layout.preferredWidth: 260
             Layout.preferredHeight: 40
@@ -114,13 +178,13 @@ Page {
             background: Rectangle {
                 radius: 6
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: parent.pressed ? "#2563EB" : (parent.hovered ? "#60A5FA" : "#3B82F6") }
-                    GradientStop { position: 1.0; color: parent.pressed ? "#1D4ED8" : (parent.hovered ? "#3B82F6" : "#2563EB") }
+                    GradientStop { position: 0.0; color: regBtn.pressed ? "#2563EB" : (regBtn.hovered ? "#60A5FA" : "#3B82F6") }
+                    GradientStop { position: 1.0; color: regBtn.pressed ? "#1D4ED8" : (regBtn.hovered ? "#3B82F6" : "#2563EB") }
                 }
                 Behavior on color { ColorAnimation { duration: 150 } }
             }
             contentItem: Text {
-                text: parent.text
+                text: regBtn.text
                 color: "white"
                 font.bold: true
                 font.pixelSize: 15
@@ -146,14 +210,15 @@ Page {
 
         // 返回登录按钮
         Button {
+            id: toLoginBtn
             text: "已有账号？去登录"
             flat: true
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 5
 
             contentItem: Text {
-                text: parent.text
-                color: parent.hovered ? "#3B82F6" : "#6B7280"
+                text: toLoginBtn.text
+                color: toLoginBtn.hovered ? "#3B82F6" : "#6B7280"
                 font.pixelSize: 13
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter

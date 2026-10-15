@@ -73,14 +73,15 @@ Page {
 
         // 忘记密码
         Button {
+            id: forgotBtn
             text: "忘记密码"
             flat: true
             Layout.alignment: Qt.AlignRight
             Layout.rightMargin: 4
 
             contentItem: Text {
-                text: parent.text
-                color: parent.hovered ? "#3B82F6" : "#6B7280"
+                text: forgotBtn.text
+                color: forgotBtn.hovered ? "#3B82F6" : "#6B7280"
                 font.pixelSize: 12
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -97,6 +98,7 @@ Page {
 
             // 登录按钮（主按钮）
             Button {
+                id: loginBtn
                 text: "登录"
                 Layout.preferredWidth: 100
                 Layout.preferredHeight: 40
@@ -104,13 +106,13 @@ Page {
                 background: Rectangle {
                     radius: 6
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: parent.pressed ? "#2563EB" : (parent.hovered ? "#60A5FA" : "#3B82F6") }
-                        GradientStop { position: 1.0; color: parent.pressed ? "#1D4ED8" : (parent.hovered ? "#3B82F6" : "#2563EB") }
+                        GradientStop { position: 0.0; color: loginBtn.pressed ? "#2563EB" : (loginBtn.hovered ? "#60A5FA" : "#3B82F6") }
+                        GradientStop { position: 1.0; color: loginBtn.pressed ? "#1D4ED8" : (loginBtn.hovered ? "#3B82F6" : "#2563EB") }
                     }
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
-                    text: parent.text
+                    text: loginBtn.text
                     color: "white"
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
@@ -121,19 +123,20 @@ Page {
 
             // 注册按钮（次按钮）
             Button {
+                id: toRegisterBtn
                 text: "注册"
                 Layout.preferredWidth: 100
                 Layout.preferredHeight: 40
 
                 background: Rectangle {
                     radius: 6
-                    color: parent.pressed ? "#E5E7EB" : (parent.hovered ? "#F3F4F6" : "#FFFFFF")
-                    border.color: parent.hovered ? "#9CA3AF" : "#D1D5DB"
+                    color: toRegisterBtn.pressed ? "#E5E7EB" : (toRegisterBtn.hovered ? "#F3F4F6" : "#FFFFFF")
+                    border.color: toRegisterBtn.hovered ? "#9CA3AF" : "#D1D5DB"
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
-                    text: parent.text
+                    text: toRegisterBtn.text
                     color: "#374151"
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
