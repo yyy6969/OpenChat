@@ -27,6 +27,7 @@ void HttpConnection::CheckDeadLine()
 {
     auto self = shared_from_this();
     deadline_.async_wait([self](beast::error_code ec) {
+        //ec==0为true
         if(!ec)
         {
             self->_socket.close();
@@ -36,13 +37,33 @@ void HttpConnection::CheckDeadLine()
 
 void HttpConnection::WriteResponse()
 {
-    //回复
     auto self = shared_from_this();
     _response.content_length(_response.body().size());
-    http::async_write(_socket, _response, [self](boost::system::error_code err, std::size_t bytes_transferred) {
-        self->_socket.shutdown(tcp::socket::shutdown_send, err);
-        self->deadline_.cancel();
-    });
+
+    http::async_write(_socket, _response,[self](boost::system::error_code err, std::size_t bytes_transferred)
+    {
+        if (err) {
+            if (err != boost::asio::error::operation_aborted)
+                {
+                    std::cerr << "async_write failed: " << err.message()
+                    << ", bytes_transferred: " << bytes_transferred << std::endl;
+                    }
+                        boost::system::error_code ignore_ec;
+                        self->_socket.close(ignore_ec);   // 兜底关闭，防止 socket 滞留
+                        self->deadline_.cancel();
+                        return;                            // 失败路径到此为止
+                        }
+
+                    // 成功路径：优雅半关闭
+                    boost::system::error_code shutdown_ec;
+                    self->_socket.shutdown(tcp::socket::shutdown_send, shutdown_ec);
+                    if (shutdown_ec && shutdown_ec != boost::asio::error::not_connected)
+                    {
+                    std::cerr << "socket shutdown failed: " << shutdown_ec.message() <<std::endl;
+                }
+
+    self->deadline_.cancel();
+        });
 }
 
 void HttpConnection::HandleReq()

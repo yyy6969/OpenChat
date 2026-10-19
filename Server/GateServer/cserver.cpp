@@ -10,9 +10,9 @@ void Cserver::Start()
 {
     auto self = shared_from_this();
     _acceptor.async_accept(_socket, [self](beast::error_code ec) {
-        //self而不是this,可以使这个self指针加一，保证这个异步接受中self不会别释放
+        //self而不是this,可以使这个self指针加一，保证这个异步接受中self不会别释放（保活）
         try {
-            //如果出粗就放弃连接
+            //如果出错就放弃连接
             if (ec) {
                 self->Start();
                 return;
