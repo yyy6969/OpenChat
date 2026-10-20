@@ -10,8 +10,10 @@ class LogicSystem:public Singleton<LogicSystem>
     friend class Singleton<LogicSystem>; //能访问构造函数
 public:
     ~LogicSystem();
-    bool HandleGet(std::string path, std::shared_ptr<HttpConnection> con);
+    bool HandleGet(const std::string& path, std::shared_ptr<HttpConnection> con);
+    bool HandlePost(std::string path, std::shared_ptr<HttpConnection> con);
     void RegGet(std::string url,HttpHandler handler);
+    void RegPost(std::string url,HttpHandler handler);
 private:
     LogicSystem();
     std::map<std::string, HttpHandler> _post_handlers;

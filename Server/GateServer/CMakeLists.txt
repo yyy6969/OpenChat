@@ -24,9 +24,10 @@ target_sources(GateServer
         logicsystem.h logicsystem.cpp
 )
 
-# Boost (asio / json / beast 均为 header-only)
+# Boost (asio / beast 为 header-only)
 find_package(Boost REQUIRED)
-target_link_libraries(GateServer PRIVATE Boost::boost)
+# jsoncpp 提供 Json::Value / Json::CharReaderBuilder 的实现，需要链接
+target_link_libraries(GateServer PRIVATE Boost::boost jsoncpp)
 
 # Deployment settings
 include(GNUInstallDirs)
