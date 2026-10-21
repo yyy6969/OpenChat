@@ -5,6 +5,41 @@ import QtQuick.Layouts
 Page {
     signal switchRegister()
 
+    Connections {
+        target: HttpMgr
+        function onSig_login_mod_finish(reqId, res, err) {
+            if (err !== 0) {
+                errorText.text = "网络请求错误（错误码 " + err + "）"
+                errorText.visible = true
+                return
+            }
+
+            let jsonDoc
+            try {
+                jsonDoc = JSON.parse(res)
+            } catch (e) {
+                errorText.text = "JSON解析失败"
+                errorText.visible = true
+                return
+            }
+
+            if (typeof jsonDoc !== "object" || jsonDoc === null || Array.isArray(jsonDoc)) {
+                errorText.text = "JSON解析失败"
+                errorText.visible = true
+                return
+            }
+
+            if (jsonDoc.error !== 0) {
+                errorText.text = "登录失败（错误码 " + jsonDoc.error + "）"
+                errorText.visible = true
+                return
+            }
+
+            errorText.visible = false
+            console.log("登录成功，uid =", jsonDoc.uid)
+        }
+    }
+
     // 美化：柔和的渐变背景
     background: Rectangle {
         gradient: Gradient {
@@ -71,6 +106,15 @@ Page {
             }
         }
 
+        // 错误提示文字
+        Text {
+            id: errorText
+            color: "#EF4444"
+            font.pixelSize: 12
+            visible: false
+            Layout.alignment: Qt.AlignHCenter
+        }
+
         // 忘记密码
         Button {
             id: forgotBtn
@@ -118,7 +162,15 @@ Page {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
-                onClicked: console.log("登录：", account.text, pwd.text)
+                onClicked: {
+                    if (account.text === "" || pwd.text === "") {
+                        errorText.text = "请输入账号和密码"
+                        errorText.visible = true
+                        return
+                    }
+                    errorText.visible = false
+                    HttpMgr.login(account.text, pwd.text)
+                }
             }
 
             // 注册按钮（次按钮）

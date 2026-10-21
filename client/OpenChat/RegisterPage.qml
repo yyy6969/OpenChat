@@ -31,6 +31,7 @@ Page {
             }
             let email = jsonObj.email
             showTip(qsTr("验证码已发送到邮箱，注意查收"), true)
+            countdownTimer.start()
             console.log("email is", email)
         }
 
@@ -70,7 +71,11 @@ Page {
                 errorText.visible = true
                 return
             }
+            if (typeof handlers[reqId] === "function") {
                 handlers[reqId](jsonDoc)
+            } else {
+                console.warn("未处理的 reqId:", reqId)
+            }
         }
     }
 
@@ -151,8 +156,12 @@ Page {
                     verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
-                    console.log("向邮箱发送验证码：" + email.text)
-                    countdownTimer.start()
+                    if (email.text === "") {
+                        showTip(qsTr("请先填写邮箱"), false)
+                        return
+                    }
+                    showTip(qsTr("验证码发送中..."), true)
+                    HttpMgr.getVerifyCode(email.text)
                 }
             }
         }
@@ -204,7 +213,7 @@ Page {
                     return
                 }
                 errorText.visible = false
-                console.log("注册提交：", username.text, email.text, pwd.text, verifyCode.text)
+                HttpMgr.registerUser(username.text, email.text, pwd.text, verifyCode.text)
             }
         }
 
