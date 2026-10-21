@@ -2,9 +2,10 @@
 #define GLOBAL_H
 #include<QByteArray>
 #include<QMetaType>
+#include<QString>
 
-// 服务端地址与接口路径统一放这里，避免散落在各处
-inline constexpr char kServerBaseUrl[] = "http://127.0.0.1:8080";
+// 服务端地址由 config.ini 读取后写入，接口路径统一放这里
+extern QString gate_url_prefix;
 inline constexpr char kGetVerifyCodePath[] = "/get_varifycode";
 inline constexpr char kUserRegisterPath[] = "/user_register";
 inline constexpr char kUserLoginPath[] = "/login";

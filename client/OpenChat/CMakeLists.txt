@@ -40,6 +40,13 @@ target_link_libraries(appOpenChat
     PRIVATE Qt6::Quick
 )
 
+# 构建后把 config.ini 放到可执行文件同目录，供程序启动时读取
+add_custom_command(TARGET appOpenChat POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/config.ini"
+        "$<TARGET_FILE_DIR:appOpenChat>/config.ini"
+)
+
 include(GNUInstallDirs)
 install(TARGETS appOpenChat
     BUNDLE DESTINATION .

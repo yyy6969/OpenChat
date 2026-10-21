@@ -156,8 +156,9 @@ Page {
                     verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
-                    if (email.text === "") {
-                        showTip(qsTr("请先填写邮箱"), false)
+                    let emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+                    if (!emailPattern.test(email.text)) {
+                        showTip(qsTr("邮箱地址不正确"), false)
                         return
                     }
                     showTip(qsTr("验证码发送中..."), true)

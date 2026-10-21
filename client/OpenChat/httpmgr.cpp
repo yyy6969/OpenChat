@@ -7,7 +7,7 @@
 namespace {
 QUrl makeUrl(const char* path)
 {
-    return QUrl(QString::fromLatin1(kServerBaseUrl) + QString::fromLatin1(path));
+    return QUrl(gate_url_prefix + QString::fromLatin1(path));
 }
 }
 
@@ -19,7 +19,7 @@ HttpMgr::~HttpMgr()
 HttpMgr *HttpMgr::create(QQmlEngine *qmlEngine, QJSEngine *jsEngine)
 {
     HttpMgr *m = HttpMgr::GetInstance().get();
-    QQmlEngine::setObjectOwnership(m, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(m, QQmlEngine::CppOwnership);// 告诉 QML：别管它，C++ 自己管理
     return m;
 }
 
