@@ -1,6 +1,7 @@
 #include "logicsystem.h"
 #include <iostream>
 #include "httpconnection.h"
+#include "VerifyClient.h"
 LogicSystem::~LogicSystem() {}
 
 void LogicSystem::RegGet(std::string url, HttpHandler handler)
@@ -43,7 +44,7 @@ LogicSystem::LogicSystem()
     RegPost("/get_varifycode", [](std::shared_ptr<HttpConnection> connection) {
         auto body_str = boost::beast::buffers_to_string(connection->_request.body().data());
         std::cout << "receive body is " << body_str << std::endl;
-        connection->_response.set(http::field::content_type, "text/json");
+        connection->_response.set(http::field::content_type, "application/json");
         Json::Value root;
         Json::Value src_root; //来源
         Json::CharReaderBuilder builder;
@@ -68,8 +69,14 @@ LogicSystem::LogicSystem()
 
         auto email = src_root["email"].asString();
         std::cout << "email is " << email << std::endl;
-        root["error"] = 0;
-        root["email"] = src_root["email"];
+
+        // 对应原 gRPC 版本的 VerifyGrpcClient::GetVarifyCode。
+        // 这里改成 HTTP + JSON 调用 Node 验证码服务，失败时 rsp.error 为 RPCFailed。
+        VerifyRsp rsp = VerifyClient::GetInstance()->GetVerifyCode(email);
+
+        root["error"] = rsp.error;
+        root["email"] = email;
+        // 不要把验证码返回给客户端，验证码只通过邮件发送。
         std::string jsonstr = root.toStyledString();
         beast::ostream(connection->_response.body()) << jsonstr;
     });

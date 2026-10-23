@@ -22,12 +22,20 @@ target_sources(GateServer
         httpconnection.h httpconnection.cpp
         Singleton.h
         logicsystem.h logicsystem.cpp
+        ConfigMgr.h ConfigMgr.cpp
+        VerifyClient.h VerifyClient.cpp
 )
 
 # Boost (asio / beast 为 header-only)
 find_package(Boost REQUIRED)
 # jsoncpp 提供 Json::Value / Json::CharReaderBuilder 的实现，需要链接
 target_link_libraries(GateServer PRIVATE Boost::boost jsoncpp)
+
+add_custom_command(TARGET GateServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/config.ini"
+        "$<TARGET_FILE_DIR:GateServer>/config.ini"
+)
 
 # Deployment settings
 include(GNUInstallDirs)
