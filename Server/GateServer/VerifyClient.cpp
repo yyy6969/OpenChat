@@ -96,10 +96,10 @@ HttpResponse PostJson(const std::string& host,
 VerifyRsp VerifyClient::GetVerifyCode(const std::string& email) {
     VerifyRsp rsp;
     rsp.email = email;
-    rsp.error = ErrorCodes::RPCFailed;
+    rsp.error = ErrorCodes::RPCFailed;//先做好最坏的打算
 
     // 从 config.ini 读取 VerifyServer 地址。
-    // 注意：配置里的 section 名是 VarifyServer，沿用第一季的拼写，避免和客户端请求路径不一致。
+    // 注意：配置里的 section 名是 VarifyServer，避免和客户端请求路径不一致。
     const auto& cfg = ConfigMgr::Inst();
     const auto& host = cfg["VarifyServer"]["Host"];
     const auto& port = cfg["VarifyServer"]["Port"];
@@ -130,7 +130,7 @@ VerifyRsp VerifyClient::GetVerifyCode(const std::string& email) {
     writer["indentation"] = "";
     const std::string body = Json::writeString(writer, request);
 
-    // 对应原 gRPC 的 stub->GetVarifyCode(...)
+    // 对应gRPC 的 stub->GetVarifyCode(...)
     const auto response = PostJson(host, port, "/get_varifycode", body,
                                    std::chrono::milliseconds(timeout_ms));
     if (!response.ok()) {
