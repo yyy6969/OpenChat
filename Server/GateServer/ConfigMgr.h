@@ -14,23 +14,12 @@ struct SectionInfo {
     SectionInfo& operator=(const SectionInfo&) = default;
 
     // 缺失 key 时返回静态空字符串的引用，不产生拷贝。
-    const std::string& operator[](const std::string& key) const
-    {
-        // 静态空字符串生命周期贯穿整个进程，返回引用是安全的。
-        static const std::string empty;
-        auto it = _section_datas.find(key);
-        return it == _section_datas.end() ? empty : it->second;
-    }
+    const std::string& operator[](const std::string& key) const;
 
     // 缺失 key 时抛出 std::out_of_range。
-    const std::string& At(const std::string& key) const
-    {
-        auto it = _section_datas.find(key);
-        if (it == _section_datas.end()) { throw std::out_of_range("config key not found: [" + key + "]"); }
-        return it->second;
-    }
+    const std::string& At(const std::string& key) const;
 
-    bool Contains(const std::string& key) const { return _section_datas.find(key) != _section_datas.end(); }
+    bool Contains(const std::string& key) const;
 
 private:
     friend class ConfigMgr;
