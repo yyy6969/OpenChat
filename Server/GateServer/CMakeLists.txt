@@ -24,6 +24,7 @@ target_sources(GateServer
         logicsystem.h logicsystem.cpp
         ConfigMgr.h ConfigMgr.cpp
         VerifyClient.h VerifyClient.cpp
+        asioiocontextpool.h asioiocontextpool.cpp
 )
 
 # Boost (asio / beast 为 header-only)
