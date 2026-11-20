@@ -23,7 +23,7 @@ public:
     void Stop(); //服务池停止的时候调用回收一些资源,并且通知挂起的线程唤醒
 
 private:
-    AsioIOContextPool(std::size_t size = 2);//也可以用std::thread::hardware_concurrency()来获取
+    AsioIOContextPool(std::size_t size = std::thread::hardware_concurrency());//也可以用std::thread::hardware_concurrency()来获取
     std::vector<IOContext> _ioservices;
     std::vector<WorkGuardPtr> _works; //防止ioservices退出的,两者数量相等
     std::vector<std::thread> _threads; //每一个ioservice跑在每一个线程

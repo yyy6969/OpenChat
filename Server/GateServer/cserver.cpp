@@ -2,17 +2,21 @@
 #include <chrono>
 #include <iostream>
 #include "httpconnection.h"
+#include "asioiocontextpool.h"
 Cserver::Cserver(boost::asio::io_context &ioc, unsigned short port)
     : _ioc(ioc)
     , _acceptor(ioc, tcp::endpoint(tcp::v4(), port))
-    , _socket(ioc)
+    //, _socket(ioc)
     , _retry_timer(ioc)
 {}
 
 void Cserver::Start()
 {
     auto self = shared_from_this();
-    _acceptor.async_accept(_socket, [self](beast::error_code ec) {
+    //从线程池中取iocontext
+    auto& io_context = AsioIOContextPool::GetInstance()->GetIoService();
+    std::shared_ptr<HttpConnection> new_con = std::make_shared<HttpConnection>(io_context);
+    _acceptor.async_accept(new_con->GetSocket(), [new_con,self](beast::error_code ec) {
         //self而不是this,可以使这个self指针加一，保证这个异步接受中self不会别释放（保活）
         //acceptor 已关闭或 io_context 正在停止，直接退出，避免忙循环
         if (ec == net::error::operation_aborted) {
@@ -30,8 +34,8 @@ void Cserver::Start()
             return;
         }
         try {
-            //创建新连接，并且创建HttpConnection来管理这个连接
-            std::make_shared<HttpConnection>(std::move(self->_socket))->Start();
+            //现在不需要在这里创建了，直接用new——con连接
+            new_con->Start();
         } catch (const std::exception& exp) {
             std::cerr << "exception is " << exp.what() << std::endl;
         }

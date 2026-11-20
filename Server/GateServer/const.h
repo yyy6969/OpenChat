@@ -11,7 +11,6 @@
 #include <json/value.h>
 #include <json/reader.h>
 //一个类似于global.h的文件
-//偷懒,后续如果有冲突发生再说
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace net = boost::asio;            // from <boost/asio.hpp>

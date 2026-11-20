@@ -25,6 +25,7 @@ target_sources(GateServer
         ConfigMgr.h ConfigMgr.cpp
         VerifyClient.h VerifyClient.cpp
         asioiocontextpool.h asioiocontextpool.cpp
+        httpconpool.h httpconpool.cpp
 )
 
 # Boost (asio / beast 为 header-only)

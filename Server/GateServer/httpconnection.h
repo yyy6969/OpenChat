@@ -4,8 +4,9 @@ class HttpConnection:public std::enable_shared_from_this<HttpConnection>
 {
     friend class LogicSystem;
 public:
-    HttpConnection(tcp::socket socket);
+    HttpConnection(boost::asio::io_context & ioc);//iocontext不能拷贝
     void Start(); //监听读写
+    tcp::socket &GetSocket();//用初始化的socket去给acceptor
 private:
     void CheckDeadLine();
     void WriteResponse();

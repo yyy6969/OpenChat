@@ -70,7 +70,6 @@ LogicSystem::LogicSystem()
         auto email = src_root["email"].asString();
         std::cout << "email is " << email << std::endl;
 
-        // 对应原 gRPC 版本的 VerifyGrpcClient::GetVarifyCode。
         // 这里改成 HTTP + JSON 调用 Node 验证码服务，失败时 rsp.error 为 RPCFailed。
         VerifyRsp rsp = VerifyClient::GetInstance()->GetVerifyCode(email);
 

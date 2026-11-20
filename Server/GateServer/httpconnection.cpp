@@ -2,8 +2,8 @@
 #include <cctype>
 #include <iostream>
 #include "logicsystem.h"
-HttpConnection::HttpConnection(tcp::socket socket)
-    : _socket(std::move(socket))
+HttpConnection::HttpConnection(boost::asio::io_context & ioc)
+    : _socket(ioc)//不需要像原来那样移动
 {}
 
 void HttpConnection::Start()
@@ -22,6 +22,11 @@ void HttpConnection::Start()
             std::cout << "exception error is" << exp.what() << std::endl;
         }
     });
+}
+
+tcp::socket& HttpConnection::GetSocket()
+{
+    return _socket;
 }
 
 void HttpConnection::CheckDeadLine()
